@@ -55,3 +55,14 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# images folder
+output_graphs/
+
+# project files
+.project
+.pydevproject
+
+.spyderproject
+
+.spyderworkspace

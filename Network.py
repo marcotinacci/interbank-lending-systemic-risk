@@ -2,7 +2,8 @@
 import networkx as nx
 import numpy as np
 import random
-import powerlaw as pl
+
+import Statistics
 
 def WeightedEdges(dg):
     """
@@ -15,10 +16,10 @@ def WeightedEdges(dg):
         # normalization factor
         norm = 0
         for j in nbrs.keys():
-            norm = norm + InterbankBorrowing(dg.node[j])
+            norm = norm + InterbankBorrowing(dg.node[j]) * dg.node[j]['ASSET']
         # assign weights to edges
         for j in nbrs.keys():
-            dg[i][j]['weight'] = InterbankBorrowing(dg.node[j]) * InterbankLoans(dg.node[i]) / norm
+            dg[i][j]['weight'] = InterbankBorrowing(dg.node[j]) * InterbankLoans(dg.node[i]) * dg.node[i]['ASSET'] * dg.node[j]['ASSET'] / norm
     return dg
 
 def UpdateAssets(dg):
@@ -90,7 +91,7 @@ def initNodes(N,alpha=None):
     if alpha == None:
         alpha = np.random.uniform(1.5,5)
     print ('alpha:',alpha)
-    sample = pl.powerlaw_sample(100, 10**10, alpha,N)
+    sample = Statistics.powerlaw_sample(100, 10**10, alpha,N)
     for i in range(N):
         equity = np.random.uniform(0, 0.25)
         cash = np.random.uniform(0, 0.25)
@@ -100,7 +101,8 @@ def initNodes(N,alpha=None):
             'EQUITY': equity,
             'DEPOSITS': np.random.uniform(0,1 - equity),
             'CASH': cash,
-            'LOANS': np.random.uniform(0, 1-cash)
+            'LOANS': np.random.uniform(0, 1-cash),
+            'BANKRUPT': False
         }
     # sorting
     sort = sorted(nodes.values(), key=lambda n: n['ASSET'], reverse=True)

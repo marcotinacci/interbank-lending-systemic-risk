@@ -6,76 +6,78 @@ Experiments from "Interbank Lending and the Spread of
 Bank Failures: A Network Model of Systemic Risk"
 """
 
-import SystemGraph as sg
+__author__="""Marco Tinacci (marco.tinacci@gmail.com)"""
+
+# file imports
+import Network as net
+import Test
+import Plot
+import Contagion
+
+# imports
 import random as rnd
-import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import time
-import Tests
 
-__author__="""Marco Tinacci (marco.tinacci@gmail.com)"""
+## TODO
+# contagio
+#   campo BANKRUPT con valori None default o failure per distinguerli nel plot
+# hist size frequenza
+# hist degree frequenza
+# classi
+# togliere sovrapposizione nodi    
 
 if __name__ == '__main__':
     
 #%% GLOBAL PARAMS SIMULATION
     # random seed
-    SEED = int(time.time())
+    # SEED = int(time.time())
+    SEED = 1
     rnd.seed(SEED)
     np.random.seed(SEED)
     # node scale factor
-    node_scale = 0.05
+    node_scale = 0.1
+    # number of nodes
+    N=100
+    # power law exponent
+    alpha=5
 
 #%% GRAPH INSTANCE    
     # nodes
-    N = 500
-    nodes = sg.initNodes(N,alpha=2.5)
+    nodes = net.initNodes(N,alpha=alpha)
     # undirected edges
     exp_degree = map(lambda x:nodes[x]['ASSET'],nodes.keys())
     exp_degree = exp_degree / max(exp_degree)
     exp_degree = exp_degree * N
-    g = nx.expected_degree_graph(exp_degree)
+    g = nx.expected_degree_graph(exp_degree,selfloops=False)
     for i in g.nodes():
         g.node[i] = nodes[i]
     # convert to digraph
-    g = sg.Graph2DiGraph(g)
+    g = net.Graph2DiGraph(g)
     # weight edges
-    g = sg.WeightedEdges(g)
-    # note: correlations must be checked before the loans update
-    Tests.correlation(g)
+    g = net.WeightedEdges(g)
+    # NOTE: correlations must be checked before the loans update
+    Test.correlation(g)
     # update assets
-    g = sg.UpdateAssets(g)
+    g = net.UpdateAssets(g)
+    g1 = nx.DiGraph(g)
+   
+   #g1.remove_nodes_from(nx.isolates(g1))
 
-    Tests.correlation(g)
-#%% DRAW GRAPH
-    # layout
-    #pos = nx.circular_layout(g)
-    pos = nx.random_layout(g)
-    # draw nodes
-    nx.draw_networkx_nodes(g,pos,
-        nodelist = g.nodes(),
-        node_size = [node_scale*g.node[k]['ASSET'] for k in g.nodes()],
-        node_color = [node_scale*g.node[k]['ASSET'] for k in g.nodes()],
-        cmap = plt.cm.Blues)
-    # draw edges
-    edges,weights = zip(*nx.get_edge_attributes(g,'weight').items())
-    nx.draw_networkx_edges(g, pos,
-        edge_color = weights,
-        width=0.5,
-        edge_cmap = plt.cm.Blues,
-        arrows=False)
-    # plot graph
-    nx.write_gml(g,'output_graphs/graph'+str(SEED)+'.gml')
-    plt.savefig('output_graphs/graph'+str(SEED)+'.png')
-    plt.show()
+#%% CONTAGION SIMULATION
+    g = Contagion.failure(0,g)
+    g.remove_nodes_from(nx.isolates(g))
+    
+#%% PLOTS
+    pos = nx.random_layout(g1)
+#    pos = nx.circular_layout(g1)
 
-#%% PLOT DEGREE/SIZE
-    fig2 = plt.figure()
-    ax2 = fig2.add_subplot(111)
-    ax2.scatter(map(lambda x:g.degree(x),g.nodes()),map(lambda y:y['ASSET'],g.node.values()))
+    Plot.plotGraph(g1,alpha,node_scale=node_scale,seed=SEED,pos=pos)
+    Plot.plotGraph(g,alpha,node_scale=node_scale,seed=SEED,pos=pos)
 
-# contagio
-# hist size frequenza
-# hist degree frequenza
-# classi: 
-# togliere sovrapposizione nodi
+    Plot.scatterDegreeSize(g1)
+
+
+
+
+

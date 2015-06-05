@@ -16,15 +16,24 @@ def plotGraph(g,alpha,node_scale=1, seed=None, pos=None):
 #       pos = nx.random_layout(g)
     # draw nodes
     nx.draw_networkx_nodes(g,pos,
-        nodelist = filter(lambda x:not Contagion.checkBankrupt(x,g),g.nodes()),
+        nodelist = filter(lambda x:g.node[x]['BANKRUPT'] == 0,g.nodes()), # active -> green
         node_size = [node_scale*g.node[k]['ASSET'] for k in g.nodes()],
-        node_color = 'b',#[node_scale*g.node[k]['ASSET'] for k in g.nodes()],
-        cmap = plt.cm.Blues)
+        node_color = 'g')#[node_scale*g.node[k]['ASSET'] for k in g.nodes()],cmap = plt.cm.Blues)
     nx.draw_networkx_nodes(g,pos,
-        nodelist = filter(lambda x:Contagion.checkBankrupt(x,g),g.nodes()),
-        node_size = [node_scale*g.node[k]['ASSET'] for k in g.nodes()],
-        node_color = 'r')
-
+        nodelist = filter(lambda x:g.node[x]['BANKRUPT'] == 2,g.nodes()), # failure -> yellow
+        node_size = 10,
+        node_color = 'y',
+        node_shape = 's')
+    nx.draw_networkx_nodes(g,pos,
+        nodelist = filter(lambda x:g.node[x]['BANKRUPT'] == 1,g.nodes()), # default -> red
+        node_size = 10,
+        node_color = 'r',
+        node_shape = 's')
+    nx.draw_networkx_nodes(g,pos,
+        nodelist = filter(lambda x:g.node[x]['BANKRUPT'] == 3,g.nodes()), # init -> blue
+        node_size = 10,
+        node_color = 'b',
+        node_shape = 's')
 
     # draw edges
     edges,weights = zip(*nx.get_edge_attributes(g,'weight').items())

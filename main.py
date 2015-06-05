@@ -20,12 +20,9 @@ import networkx as nx
 import numpy as np
 
 ## TODO
-# contagio
-#   campo BANKRUPT con valori None default o failure per distinguerli nel plot
 # hist size frequenza
 # hist degree frequenza
 # classi
-# togliere sovrapposizione nodi    
 
 if __name__ == '__main__':
     
@@ -36,43 +33,33 @@ if __name__ == '__main__':
     rnd.seed(SEED)
     np.random.seed(SEED)
     # node scale factor
-    node_scale = 0.1
+    node_scale = 0.15
     # number of nodes
     N=100
     # power law exponent
-    alpha=5
+    alpha=4
 
 #%% GRAPH INSTANCE    
-    # nodes
-    nodes = net.initNodes(N,alpha=alpha)
-    # undirected edges
-    exp_degree = map(lambda x:nodes[x]['ASSET'],nodes.keys())
-    exp_degree = exp_degree / max(exp_degree)
-    exp_degree = exp_degree * N
-    g = nx.expected_degree_graph(exp_degree,selfloops=False)
-    for i in g.nodes():
-        g.node[i] = nodes[i]
+    # graph
+    g = net.initGraph(N,alpha=alpha)
     # convert to digraph
     g = net.Graph2DiGraph(g)
     # weight edges
     g = net.WeightedEdges(g)
-    # NOTE: correlations must be checked before the loans update
-    Test.correlation(g)
     # update assets
     g = net.UpdateAssets(g)
     g1 = nx.DiGraph(g)
    
-   #g1.remove_nodes_from(nx.isolates(g1))
-
 #%% CONTAGION SIMULATION
-    g = Contagion.failure(0,g)
-    g.remove_nodes_from(nx.isolates(g))
+    Contagion2.contagion(0,g)
+    #g.remove_nodes_from(nx.isolates(g))
     
 #%% PLOTS
-    pos = nx.random_layout(g1)
-#    pos = nx.circular_layout(g1)
+#    pos = nx.random_layout(g1)
+    pos = nx.circular_layout(g1)
 
     Plot.plotGraph(g1,alpha,node_scale=node_scale,seed=SEED,pos=pos)
+    Contagion.cleanZeroEdges(g)
     Plot.plotGraph(g,alpha,node_scale=node_scale,seed=SEED,pos=pos)
 
     Plot.scatterDegreeSize(g1)

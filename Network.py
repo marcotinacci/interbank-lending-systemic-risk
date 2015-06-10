@@ -87,11 +87,11 @@ def initGraph(N,alpha=None):
         alpha: power law exponent, if None is drawn at random in [1.5,5.0]
         returns: list of nodes information sorted by decreasing assets
     """
-    print ('# INIT GRAPH')
+#    print ('# INIT GRAPH')
     nodes = {}
     if alpha == None:
         alpha = np.random.uniform(1.5,5)
-    print ('alpha:',alpha)
+#    print ('alpha:',alpha)
     sample = Statistics.powerlaw_sample(100, 10**10, alpha,N)
     for i in range(N):
         equity = np.random.uniform(0, 0.25)
@@ -116,9 +116,59 @@ def initGraph(N,alpha=None):
     exp_degree = exp_degree / max(exp_degree)
     exp_degree = exp_degree * N
     g = nx.expected_degree_graph(exp_degree,selfloops=False)
+    for i in g.nodes():
+        g.node[i] = nodes[i]
+    return g
+
+def initGraphByClass(N,nc,alpha=None):
+    """
+    Init graph, assets are drawn from a power law distribution, 
+    other information are chosen at random in ranged specified in the paper
+        N: number of nodes
+        alpha: power law exponent, if None is drawn at random in [1.5,5.0]
+        returns: list of nodes information sorted by decreasing assets
+    """
+    nodes = {}
+    if alpha == None:
+        alpha = np.random.uniform(1.5,5)
+    sample = Statistics.powerlaw_sample(100, 10**10, alpha,N)
+    inf = 0.25
+    sup = 1
+    steps = (sup-inf)/nc
+    points = drange(inf,sup,steps)
+    for i in range(N):
+        equity = np.random.uniform(0, 0.25)
+        cash = np.random.uniform(points[i%nc]-steps, points[i%nc])
+        # node information
+        nodes[i] = {
+            'ASSET': sample[i],
+            'EQUITY': equity,
+            'DEPOSITS': np.random.uniform(0,1-equity),
+            'CASH': cash,
+            'LOANS': np.random.uniform(0, 1-cash),
+            # 0: False, 1: default, 2: failure, 3: exogenous
+            'BANKRUPT': 0 
+        }      
+    # sorting
+    sort = sorted(nodes.values(), key=lambda n: n['ASSET'], reverse=True)
+    # nodes as dictionary
+    nodes = {i: sort[i] for i in range(len(sort))}
+    
+    # undirected edges
+    exp_degree = map(lambda x:nodes[x]['ASSET'],nodes.keys())
+    exp_degree = exp_degree / max(exp_degree)
+    exp_degree = exp_degree * N
+    g = nx.expected_degree_graph(exp_degree,selfloops=False)
     # remove cycles
     #g = nx.bfs_tree(g,0)
     for i in g.nodes():
         g.node[i] = nodes[i]
-
     return g
+
+def drange(start, stop, step):
+    r = start
+    l=[]
+    while r < stop:
+        l.append(r)
+        r += step
+    return l

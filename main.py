@@ -33,15 +33,16 @@ if __name__ == '__main__':
     rnd.seed(SEED)
     np.random.seed(SEED)
     # node scale factor
-    node_scale = 0.15
+    node_scale = 0.01
     # number of nodes
     N=100
     # power law exponent
-    alpha=4
+    alpha=2
 
 #%% GRAPH INSTANCE    
     # graph
-    g = net.initGraph(N,alpha=alpha)
+    g = net.initGraphByClass(N,1,alpha=alpha)
+  #  g = net.initGraph(N,alpha=alpha)
     # convert to digraph
     g = net.Graph2DiGraph(g)
     # weight edges
@@ -51,18 +52,19 @@ if __name__ == '__main__':
     g1 = nx.DiGraph(g)
    
 #%% CONTAGION SIMULATION
-    Contagion2.contagion(0,g)
+    Contagion.contagion(0,g)
     #g.remove_nodes_from(nx.isolates(g))
     
 #%% PLOTS
 #    pos = nx.random_layout(g1)
-    pos = nx.circular_layout(g1)
+#    pos = nx.circular_layout(g1)
+    pos=nx.graphviz_layout(g1,prog='twopi',root=0)
 
     Plot.plotGraph(g1,alpha,node_scale=node_scale,seed=SEED,pos=pos)
     Contagion.cleanZeroEdges(g)
     Plot.plotGraph(g,alpha,node_scale=node_scale,seed=SEED,pos=pos)
 
-    Plot.scatterDegreeSize(g1)
+#    Plot.scatterDegreeSize(g1)
 
 
 

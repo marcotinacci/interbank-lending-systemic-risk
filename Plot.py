@@ -36,17 +36,18 @@ def plotGraph(g,alpha,node_scale=1, seed=None, pos=None):
         node_shape = 's')
 
     # draw edges
-    edges,weights = zip(*nx.get_edge_attributes(g,'weight').items())
-    nx.draw_networkx_edges(g, pos,
-        edge_color = weights,
-        width=0.5,
-        edge_cmap = plt.cm.Blues,
-        arrows=False)
+    if g.edges():
+        edges,weights = zip(*nx.get_edge_attributes(g,'weight').items())
+        nx.draw_networkx_edges(g, pos,
+                               edge_color = map(lambda x:x+20,weights),
+                               width=1,
+                               edge_cmap = plt.cm.Blues,
+                               arrows=False)
+    
     # plot graph
-    if not seed == None:
-        nx.write_gml(g,'output_graphs/n'+str(len(g))+'a'+str(alpha)+'s'+str(seed)+'.gml')
-        plt.savefig('output_graphs/n'+str(len(g))+'a'+str(alpha)+'s'+str(seed)+'.png')
-        plt.show()
+    nx.write_gml(g,'output_graphs/n'+str(len(g))+'a'+str(alpha)+'s'+str(seed)+'.gml')
+    plt.savefig('output_graphs/n'+str(len(g))+'a'+str(alpha)+'s'+str(seed)+'.png')
+    plt.show()
     return pos
 
 def scatterDegreeSize(g):

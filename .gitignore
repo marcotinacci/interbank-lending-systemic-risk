@@ -72,3 +72,9 @@ TentativeFunction.py
 shock.png
 
 net.png
+
+*.aux
+
+docs/main.synctex.gz
+
+*.lb

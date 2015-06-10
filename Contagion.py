@@ -1,7 +1,7 @@
 import Network
 
 # CONTAGION PARAMS
-RECOVERY_RATE = 0.1
+RECOVERY_RATE = 0.5
 
 def contagion(init,dg):
     dg.node[init]['BANKRUPT'] = 3
@@ -47,7 +47,7 @@ def callInLoan(frm,to,dg):
     loan = dg[frm][to]['weight']
     old_asset = dg.node[to]['ASSET']
     if checkBankrupt(to,dg):
-        print 'call in loop',frm,to
+        #print 'call in loop',frm,to
         # a loan from a failing bank is completely loss
         loss = loan
         old_asset = dg.node[frm]['ASSET']
@@ -63,7 +63,7 @@ def callInLoan(frm,to,dg):
             dg.node[frm]['DEPOSITS'] = 1
             dg.node[frm]['EQUITY'] = 0
         # remove loan edge
-        dg[frm][to]['weight'] = 0
+#        dg[frm][to]['weight'] = 0
     elif dg.node[to]['CASH'] * old_asset < loan:
         # bankrupt by failure mechanism
         failure(to,2,dg)
@@ -78,7 +78,9 @@ def callInLoan(frm,to,dg):
         dg.node[to]['EQUITY'] = (dg.node[to]['EQUITY'] * old_asset) / dg.node[to]['ASSET']
         # remove loan edge
         #dg.remove_edge(frm,to)
-        dg[frm][to]['weight'] = 0
+#        dg[frm][to]['weight'] = 0
+    # remove loan edge
+    dg[frm][to]['weight'] = 0
 
 def failure(b,failType,dg):
     dg.node[b]['BANKRUPT'] = failType

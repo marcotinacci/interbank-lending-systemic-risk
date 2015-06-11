@@ -85,7 +85,6 @@ def initGraph(N,alpha=None):
     other information are chosen at random in ranged specified in the paper
         N: number of nodes
         alpha: power law exponent, if None is drawn at random in [1.5,5.0]
-        returns: list of nodes information sorted by decreasing assets
     """
 #    print ('# INIT GRAPH')
     nodes = {}
@@ -120,7 +119,7 @@ def initGraph(N,alpha=None):
         g.node[i] = nodes[i]
     return g
 
-def initGraphByClass(N,nc,alpha=None):
+def initGraphMod(N,k,niter,alpha=None):
     """
     Init graph, assets are drawn from a power law distribution, 
     other information are chosen at random in ranged specified in the paper
@@ -132,20 +131,18 @@ def initGraphByClass(N,nc,alpha=None):
     if alpha == None:
         alpha = np.random.uniform(1.5,5)
     sample = Statistics.powerlaw_sample(100, 10**10, alpha,N)
-    inf = 0.25
-    sup = 1
-    steps = (sup-inf)/nc
-    points = drange(inf,sup,steps)
+
     for i in range(N):
         equity = np.random.uniform(0, 0.25)
-        cash = np.random.uniform(points[i%nc]-steps, points[i%nc])
+        cash = np.random.uniform(0, 0.25)
         # node information
         nodes[i] = {
             'ASSET': sample[i],
             'EQUITY': equity,
             'DEPOSITS': np.random.uniform(0,1-equity),
             'CASH': cash,
-            'LOANS': np.random.uniform(0, 1-cash),
+            'LOANS': np.random.uniform(k*(1-cash)/niter,(1-cash)),
+#            'LOANS': np.random.uniform(0, 1-cash),
             # 0: False, 1: default, 2: failure, 3: exogenous
             'BANKRUPT': 0 
         }      

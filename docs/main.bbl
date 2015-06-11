@@ -1,0 +1,26 @@
+\begin{thebibliography}{1}
+
+\bibitem{pygraphviz}
+Pygraphviz.
+\newblock \url{https://pygraphviz.github.io/}.
+
+\bibitem{ChungLu}
+Fan Chung and Linyuan Lu.
+\newblock Connected components in random graphs with given expected degree
+  sequences.
+\newblock {\em Annals of Combinatorics}, pages 125--145.
+
+\bibitem{networkx}
+Aric~A. Hagberg, Daniel~A. Schult, and Pieter~J. Swart.
+\newblock Exploring network structure, dynamics, and function using {NetworkX}.
+\newblock In {\em Proceedings of the 7th Python in Science Conference
+  (SciPy2008)}, pages 11--15, Pasadena, CA USA, August 2008.
+
+\bibitem{KrauseGiansante}
+Andreas Krause and Simone Giansante.
+\newblock Interbank lending and the spread of bank failures : a network model
+  of systemic risk.
+\newblock {\em Journal of Economic Behavior and Organization}, 83(3):583--608,
+  August 2012.
+
+\end{thebibliography}

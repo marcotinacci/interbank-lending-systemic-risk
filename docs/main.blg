@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2014)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: ./main.aux
+The style file: plain.bst
+Database file #1: biblio.bib
+Warning--to sort, need author or key in pygraphviz
+Warning--empty year in ChungLu
+You've used 4 entries,
+            2118 wiz_defined-function locations,
+            521 strings with 4617 characters,
+and the built_in function-call counts, 1378 in all, are:
+= -- 140
+> -- 45
+< -- 2
++ -- 18
+- -- 14
+* -- 89
+:= -- 206
+add.period$ -- 11
+call.type$ -- 4
+change.case$ -- 19
+chr.to.int$ -- 0
+cite$ -- 6
+duplicate$ -- 59
+empty$ -- 119
+format.name$ -- 14
+if$ -- 307
+int.to.chr$ -- 0
+int.to.str$ -- 4
+missing$ -- 3
+newline$ -- 22
+num.names$ -- 6
+pop$ -- 27
+preamble$ -- 1
+purify$ -- 15
+quote$ -- 0
+skip$ -- 50
+stack$ -- 0
+substring$ -- 97
+swap$ -- 20
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 16
+warning$ -- 2
+while$ -- 13
+width$ -- 5
+write$ -- 42
+(There were 2 warnings)

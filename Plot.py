@@ -7,6 +7,7 @@ Created on Thu May 21 14:37:15 2015
 
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 import Contagion
 
 def plotGraph(g,alpha,node_scale=1, seed=None, pos=None):
@@ -50,8 +51,14 @@ def plotGraph(g,alpha,node_scale=1, seed=None, pos=None):
     plt.show()
     return pos
 
-def scatterDegreeSize(g):
-    fig2 = plt.figure()
-    ax2 = fig2.add_subplot(111)
-    ax2.scatter(map(lambda x:g.degree(x), g.nodes()),
+def scatterDegreeSize(g):    
+#    fig = plt.figure()
+#    ax2 = fig.add_subplot(111)
+#    ax2.scatter(map(lambda x:g.degree(x), g.nodes()),
+#                map(lambda y:y['ASSET'], g.node.values()))
+    plt.scatter(map(lambda x:g.degree(x), g.nodes()),
                 map(lambda y:y['ASSET'], g.node.values()))
+    plt.xlabel('degree')
+    plt.ylabel('asset')
+    plt.show()
+

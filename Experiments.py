@@ -23,16 +23,18 @@ if __name__ == '__main__':
     # node scale factor
     node_scale = 0.1
     # number of nodes
-    N=50
+    N=200
     # power law exponent
-    alpha=2
+    alpha=4
     avg = []
-    for i in range(1,30,2):
+    niter = 20
+    nrep = 20
+    for i in range(0,niter):
 #%% GRAPH INSTANCE
         ff = []
-        for it in range(10):
+        for it in range(nrep):
             # graph
-            g = net.initGraphByClass(N,i,alpha=alpha)
+            g = net.initGraphMod(N,i,niter,alpha=alpha)
             copy = nx.DiGraph(g)
             # convert to digraph
             g = net.Graph2DiGraph(g)
@@ -51,10 +53,7 @@ if __name__ == '__main__':
     #        print 'betweeness:',nx.betweenness_centrality(copy)
 #            pos = nx.circular_layout(g)
 #            Plot.plotGraph(g,alpha,node_scale=node_scale,seed=SEED,pos=pos)
-    
         avg.append(sum(ff) / len(ff))
-        print 
-        print 'AVG:',avg[len(avg)-1]
-        print
+        print avg[len(avg)-1],',',
 
-    plt.plot(avg)
+    plt.plot(avg,'g-o')

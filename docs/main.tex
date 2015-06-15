@@ -8,7 +8,8 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{hyperref}
-
+\usepackage[english]{babel}
+\usepackage{cleveref}
 
 \begin{document}
 
@@ -23,7 +24,9 @@ All the material of this work, including the up-to-date version of this document
 \label{sec:introduction}
 We take under consideration large banking systems. In \cite{KrauseGiansante} many real examples of systems are considered and they propose a taxonomy in which tiering and size are the two orthogonal dimensions. We can model this kind of system as a network where connections represent interbank loans. We have a high level of tiering when a few banks dominate the majority of connections, like the UK and Italian market.
 
-We want to analyze what happens when the an exogenous shock make the biggest bank fail generating a chain of losses to other connected banks. To do that we implement a generator of realistic banking systems and the propagation mechanism and we run some simulation to check how the failure spreads if we change some system parameters. We will describe decisions that has not been specified in \cite{KrauseGiansante} and we will focus on how the contagion mechanism changes when banks adopt heterogenous model of loans (to customers or to other banks) and when they adopt an homogenous model, in our case, a model focused on loans to customers.
+To generate realistic bank networks with respect to this taxonomy we will use a Chung-Lu model \cite{ChungLu} instead of a Barabási-Albert \cite{barabasi1999emergence}, as described in \cite{KrauseGiansante}. We adopt this different model because it is not clear how they can conciliate two power law distribution, assets and degrees, with the standard generation algorithm. The structure of the obtained networks result to be similar to their examples. Main concepts about random graphs and centrality measures that has been employed in this work can be found in \cite{Newman}.
+
+We want to analyze what happens when the an exogenous shock make the biggest bank fail generating a chain of losses to other connected banks. To do that we implement a generator of realistic banking systems and the propagation mechanism, then we run some simulation to check how the failure spreads if we change some system parameters. We will describe decisions that has not been specified in \cite{KrauseGiansante} and we will focus on how the contagion mechanism changes when banks adopt heterogenous model of loans (to customers or to other banks) and when they adopt an homogenous model, in our case, a model focused on loans to customers.
 
 % section introduction (end)
 
@@ -31,11 +34,11 @@ We want to analyze what happens when the an exogenous shock make the biggest ban
 \label{sec:model}
 
 \paragraph{Bank network} % definizione grafo orientato pesato
-To build the bank network we take the model adopted in \cite{KrauseGiansante}. The single bank is represented by a node of the network and contains some information about the internal balance. Formally we define a node $\mathcal{B}$ as follows
+To build the bank network we use the model adopted in \cite{KrauseGiansante}. The single bank is represented by a node of the network and contains some information about the internal balance. Formally we define a node $B$ as follows
 $$ B = \langle A,\rho,\beta,\gamma,\alpha \rangle $$
-such that $A \in \mathbb{R}$, $\rho,\beta,\gamma,\alpha \in [0,1]$, $\rho + \beta \leq 1$ and $\gamma + \alpha \leq 1$. $A$ is the asset of $B$, $\rho \cdot A$ are cash reserves, $\beta \cdot A$ are loans to customers and $(1-\rho-\beta) \cdot A$ are loans to other banks. Other fractions are liabilities: $\gamma \cdot A$ are deposits by customers, $\alpha \cdot A$ is the equity and $(1-\gamma-\alpha) \cdot A$ are loans received from other banks. We will consider two main failure condition of a bank: $\rho = 0$ and $\alpha = 0$.
+such that $A \in \mathbb{R}^+$, $\rho,\beta,\gamma,\alpha \in [0,1]$, $\rho + \beta \leq 1$ and $\gamma + \alpha \leq 1$. $A$ is the \emph{asset} of $B$, $\rho \cdot A$ are \emph{cash reserves}, $\beta \cdot A$ are \emph{loans to customers} and $(1-\rho-\beta) \cdot A$ are \emph{loans to other banks}. Other fractions are liabilities: $\gamma \cdot A$ are \emph{deposits by customers}, $\alpha \cdot A$ is the \emph{equity} and $(1-\gamma-\alpha) \cdot A$ are \emph{loans received} from other banks. We will consider two main failure condition of a bank: $\rho = 0$ and $\alpha = 0$.
 
-To denote different nodes we use a subscript notation $B_i$ and the same for its internal data $A_i,\rho_i,\beta_i,\gamma_i,\alpha_i$. We denote with $\mathcal{B}$ the set of all the banks taken into account in our system.
+To denote different nodes we use a subscript notation $B_i$ and the same for its internal data $A_i,\rho_i,\beta_i,\gamma_i,\alpha_i$. We denote with $\mathcal{B}$ the set of all banks taken into account in our system.
 Interbank loans are represented by the relation $L \subseteq \mathcal{B} \times \mathbb{R^+} \times \mathcal{B}$ and we say that $(B_1,l,B_2) \in L$ when bank $B_1$ lend $l$ to $B_2$, we can also write $B_1 \xrightarrow{l} B_2$.
 Now we can define the banking system network as a directed weighted graph $\mathcal{G} = \langle \mathcal{B}, L \rangle$ where $\mathcal{B}$ is the set of bank nodes and $L$ is the relation that contains all the oriented and weighted edges between nodes.
 
@@ -63,7 +66,7 @@ where $B_1,B_2 \in \mathcal{B}$ and $w_{B_1}, w_{B_2}$ are respectively their ex
 	\caption{Scatter plots between degrees and assets generated trough power laws with different exponent $a$. The minimum correlation $\rho$ is $0.93$}\label{fig:corr}
 \end{figure}
 
-Since a loan is naturally modeled as an \emph{oriented} edge, we need to modify the graph structure in order to obtain such feature, preserving the described properties. We use the following procedure: every undirected edge $(B_i, B_j)$ is replaced by a directed one, with equal probability by $(B_i,B_j)$ or $(B_j,B_i)$. This trivially guarantees that the degree (input and output) of each node in the directed graph is still following a power law distribution.
+Since a loan can be naturally modeled as an \emph{oriented} edge, we need to modify the graph structure in order to obtain such feature, preserving the described properties. We use the following procedure: every undirected edge $(B_i, B_j)$ is replaced by a directed one, with equal probability by $(B_i,B_j)$ or $(B_j,B_i)$. This trivially guarantees that the degree (input and output) of each node in the directed graph is still following a power law distribution.
 
 Finally we need to transform the just described directed graph to a \emph{weighted} directed graph whose weights are interbank loans' amounts. If $(B_i,B_j)$ is an edge of the directed graph then $(B_i,l,B_j)$, $B_i$ lend $l$ to $B_j$, is a weighted edge of the weighted directed graph such that 
 $$l = \frac{A_j(1-\gamma_j-\alpha_j) \cdot A_i(1-\rho_i-\beta_i)}{\sum_{k \in cred(i)} A_k(1-\gamma_k-\alpha_k)}$$
@@ -72,11 +75,11 @@ where $cred(i)$ is the index set of all the creditors of bank $B_i$. Using the p
 \paragraph{Contagion} % meccanismi di contagio
 The event we are going to simulate is the contagion of a failure after the bank with the highest asset $B_0$ fails by an exogenous event. Then $B_0$ is forced to repay its debts and, to do so, it also has to call back its loans to other banks. Calling loans in and repaying debts with respect to other banks are two mechanisms that can propagate the failure to other banks and they are called respectively \emph{failure mechanism} and \emph{default mechanism}.
 
-In the failure mechanism every loan to another bank, say $B_c$, is called in and if the creditor bank has not enough cash to restore the debt then it goes bankrupt in turn and the initially failing bank needs to wait for the entire failing procedure of $B_c$ to recover its money. This mechanism can lead to a chain of failures and, in some cases, also in a cyclic chain. When the latter happens it means that a failing bank is calling in a loan from another failing bank, in this case we assume that this bank lose the entire loan. Another likely case is the bankrupt by combined call in of loans: this happens when $B_c$ would be able to repay debts to more than one bank individually, but if more failure happens $B_c$ does not have enough cash to repay the sum of recalled loans. Since the purpose of this procedure is transforming the whole bank asset into cash (basically $\rho = 1$) we also need to call loans to customers back, but only a part of this loans can be recovered, in our case we assume a recovery rate $k$ that is the same for every bank.
+In the failure mechanism every loan to another bank, say $B_c$, is called in and if the creditor bank has not enough cash to restore the debt (condition $\rho = 0$) then it goes bankrupt in turn and the initially failing bank needs to wait for the entire failing procedure of $B_c$ to recover its money. This mechanism can lead to a chain of failures and, in some cases, also in a cyclic chain. When the latter happens it means that a failing bank is calling in a loan from another failing bank, in this case we assume that this bank lose the entire loan. Another likely case is the bankrupt by combined call in of loans: this happens when $B_c$ would be able to repay debts to more than one bank individually, but if more failure happens $B_c$ does not have enough cash to repay the sum of recalled loans. Since the purpose of this procedure is transforming the whole bank asset into cash (basically $\rho = 1$) we also need to call loans to customers back, but only a part of this loans can be recovered, in our case we assume a recovery rate $k$ that is the same for every bank.
 
 After a failing bank terminate to call in its credits it must start to repay its debts. Deposits to customers are the first to be restored, then, if some cash remains, borrowing with respect to other banks must be restored. If the failing bank is able to restore every debt to other banks then the failure cannot propagate to them. Otherwise the bank equally split its remaining cash among all the debtor banks (except for smaller debts, those below the split fraction, that are paid individually) and the difference between the actual debt and the restored part results as a loss for the debtor. This loss is recorded as a decrement of the equity in the liabilities and when equity goes to zero ($\alpha = 0$) the bank goes bankrupt and so the failure propagate. Again, it may happen that a bank would be able to sustain individual losses deriving from a partially repaid debt but it actually goes bankrupt for their summed effect.
 
-The exogenous failure is triggered by setting the biggest bank's equity to zero, this will force it to go bankrupt and to start the contagion. In Figures~\ref{fig:network2}, \ref{fig:network3} and \ref{fig:network4} we show some examples of randomly generated network, before and after the trigger of the exogenous failure, respectively with $a=2$, $a=3$ and $a=4$. Green nodes are active banks, yellow nodes are banks failed by failure mechanism, red nodes are banks failed by default mechanism and the blue node is the trigger.
+The exogenous failure is triggered by setting the biggest bank's equity to zero, this will force it to go bankrupt and to start the contagion. In Figures~\ref{fig:network2}, \ref{fig:network3} and \ref{fig:network4} we show some examples of randomly generated network, before and after the trigger of the exogenous failure, respectively with $a=2$, $a=3$ and $a=4$. Green nodes are active banks, yellow nodes are banks failed by failure mechanism, red nodes are banks failed by default mechanism and the blue node is the trigger. Edges are colored with shades of blues, a darker edge corresponds to an higher loan.
 
 \begin{figure}[htbp]
     \centering
@@ -120,26 +123,50 @@ We want to analyze how different kind of networks react to the exogenous failure
 \section{Experiments} % (fold)
 \label{sec:experiments}
 
-We consider the following set up: bank assets $A_i \in [100;10^{10}]$ are drawn from a power law distribution with exponent $a \in \{2,3,4\}$ and recovery rate $r = 0.5$ for every bank. Bank specific fractions are drawn from uniform distribution over the following ranges: $\rho_i \in [0;0.25]$, $\beta_i \in [0;1-\rho_i]$, $\alpha_i \in [0;0.25]$ and $\gamma_i \in [0;1-\alpha_i]$. We adopt the following generalized notion of range for the customer loans fraction 
-$$\beta_i^k \in \left[ k \cdot s\ ; 1-\rho_i \right]$$
-for $k \in [0..niter-1]$ and the step size $s = (1-\rho_i) / niter$. $niter$ is an arbitrary number of iterations, the higher it is the finer is the analysis. Note that for $k = 0$ it boils down to the range defined initially $\beta_i^0 \equiv \beta_i$. Using this kind of variation we can observe how the fraction failing changes in a bank system where loans to customers are more or less common than interbank loans.
+We consider the following set up: bank assets $A_i \in [100;10^{10}]$ are drawn from a power law distribution with exponent $a \in \{2,3,4\}$ and recovery rate $r = 0.5$ for every bank. Bank specific fractions are drawn from uniform distribution over the following ranges: $\rho_i \in [0;0.25]$, $\beta_i \in [0;1-\rho_i]$, $\alpha_i \in [0;0.25]$ and $\gamma_i \in [0;1-\alpha_i]$. For this experiment we adopt the following generalized notion of range for the customer loans fraction 
+\begin{equation}\label{eq:exp1}
+	\beta_i^k \in \left[ k \cdot s\ ; 1-\rho_i \right]	
+\end{equation}
+for $k \in [0..niter-1]$ and the step size $s = (1-\rho_i) / niter$. $niter$ is an arbitrary number of iterations, the higher it is the finer is the analysis, we used $niter = 20$. Note that for $k = 0$ it boils down to the range defined initially $\beta_i^0 \equiv \beta_i$. Using this kind of variation we can observe how the fraction failing changes in a bank system where loans to customers are more or less common than interbank loans.
 
-From simulations we obtain experimental results shown in Figures~\ref{fig:exp1}, \ref{fig:exp2} and \ref{fig:exp3}. We considered respectively network of dimension $50$, $100$ and $200$ and the plots represent how the fraction failing decrease as $k$ grows, in an average of $20$ simulations for each step. We can see that the fraction failing is always decreasing if we increase the probability of the banking system to put more effort into loans to customers instead of other banks. This is expected since bank connections will not be strong enough to reach the failure conditions when $k$ is high. Another observation to be made is that fraction failing decrease is slower when $a$ is low, moreover the fraction failing seems to be lower for initial values of $k$ but at some point the trend is always inverted. From this we can infer that a core-periphery structure is safer when loaning attitudes are heterogeneous, but it is unsafe when the general approach is based on loans to customers that will generate large losses due to the recovery rate. We can also say that a core-periphery model is harder to make safe if compared to a more homogeneous one. All these observations hold for every dimension of network analyzed in our experiments, in fact dynamics highlighted by the experiments remain evident. When we increase $N$ the only notable difference is a transversal decrease of the fraction failing, from this we can say that larger systems are more resistant to failure contagion.
+From simulations we obtain experimental results shown in \Cref{fig:exp1,fig:exp2,fig:exp3}. We considered respectively network of dimension $50$, $100$ and $200$ and the plots represent how the fraction failing decrease as $k$ grows, in an average of $20$ simulations for each step. We can see that the fraction failing is always decreasing if we increase the probability of the banking system to put more effort into loans to customers instead of other banks. This is expected since bank connections will not be strong enough to reach the failure conditions when $k$ is high. Another observation to be made is that fraction failing decrease is slower when $a$ is low, moreover the fraction failing seems to be lower for initial values of $k$ but at some point the trend is always inverted. From this we can infer that a core-periphery structure is safer when loaning attitudes are heterogeneous, but it is unsafe when the general approach is based on loans to customers that will generate large losses due to the recovery rate. We can also say that a core-periphery model is harder to make safe if compared to a more homogeneous one. All these observations hold for every dimension of network analyzed in our experiments, in fact dynamics highlighted by the experiments remain evident. When we increase $N$ the only notable difference is a transversal decrease of the fraction failing, from this we can say that larger systems are more resistant to failure contagion.
 
 \begin{figure}[htbp]
     \centering
 	\includegraphics[width=.8\textwidth]{images/ff50.png}
-	\caption{Plots of failing fraction when iterator $k$ changes, in a bank network of size $N=50$}\label{fig:exp1}
+	\caption{Plots of failing fraction when ranges change as in~(\ref{eq:exp1}), in a bank network of size $N=50$}\label{fig:exp4}
 \end{figure}
 \begin{figure}[htbp]
     \centering
 	\includegraphics[width=.8\textwidth]{images/ff100.png}
-	\caption{Plots of failing fraction when iterator $k$ changes, in a bank network of size $N=100$}\label{fig:exp2}
+	\caption{Plots of failing fraction when ranges change as in~(\ref{eq:exp1}), in a bank network of size $N=100$}\label{fig:exp5}
 \end{figure}
 \begin{figure}[htbp]
     \centering
 	\includegraphics[width=.8\textwidth]{images/ff200.png}
-	\caption{Plots of failing fraction when iterator $k$ changes, in a bank network of size $N=200$}\label{fig:exp3}
+	\caption{Plots of failing fraction when ranges change as in~(\ref{eq:exp1}), in a bank network of size $N=200$}\label{fig:exp6}
+\end{figure}
+
+We also run another experiment where we consider different intervals. This time we consider more homogeneous bank systems choosing the following ranges
+\begin{equation}\label{eq:exp2}
+	\beta_i^k \in \left[ k \cdot s\ ; (k+1) \cdot s \right]	
+\end{equation}
+again for $k \in [0..niter-1]$ and the step size $s = (1-\rho_i) / niter$. The main difference from the previous experiment consists in analyzing specific intervals of the uniform partition, instead of cumulating intervals. Results depicted in \Cref{fig:exp4,fig:exp5,fig:exp6} show that central intervals easily lead to an higher failing fraction, while we have safer structures with extremely low or high ranges. This means that using mid intervals banks are more sensible to both kind of losses, due to the recovery rate and to not repaid loans. If we consider a system where we isolate one of these two causes we have a lower failing fraction, we can see this in the extreme left and right of every plot. When we change $a$ we notice that core-periphery structures suffer from less fluctuations with respect with more distributed model, then we can say that centric structures are more resistant to interval variations but in the extremes they do not achieve the best results, indeed they suffer recovery rate losses more than structures generated with high $a$. Results do not change when we change the size of the network.
+
+\begin{figure}[htbp]
+    \centering
+	\includegraphics[width=.8\textwidth]{images/ff50-2.png}
+	\caption{Plots of failing fraction when ranges change as in~(\ref{eq:exp2}), in a bank network of size $N=50$}\label{fig:exp1}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+	\includegraphics[width=.8\textwidth]{images/ff100-2.png}
+	\caption{Plots of failing fraction when ranges change as in~(\ref{eq:exp2}), in a bank network of size $N=100$}\label{fig:exp2}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+	\includegraphics[width=.8\textwidth]{images/ff200-2.png}
+	\caption{Plots of failing fraction when ranges change as in~(\ref{eq:exp2}), in a bank network of size $N=200$}\label{fig:exp3}
 \end{figure}
 
 % section experiments (end)

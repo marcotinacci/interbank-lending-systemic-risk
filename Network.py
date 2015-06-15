@@ -141,7 +141,8 @@ def initGraphMod(N,k,niter,alpha=None):
             'EQUITY': equity,
             'DEPOSITS': np.random.uniform(0,1-equity),
             'CASH': cash,
-            'LOANS': np.random.uniform(k*(1-cash)/niter,(1-cash)),
+            #'LOANS': np.random.uniform(k*(1-cash)/niter,(1-cash)),
+            'LOANS': np.random.uniform(k*(1-cash)/niter,(k+1)*(1-cash)/niter),
 #            'LOANS': np.random.uniform(0, 1-cash),
             # 0: False, 1: default, 2: failure, 3: exogenous
             'BANKRUPT': 0 
